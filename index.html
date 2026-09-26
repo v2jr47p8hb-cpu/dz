@@ -2,14 +2,35 @@
 <html lang="ru" data-role="s">
 <head>
 <meta charset="utf-8">
+<meta http-equiv="Content-Security-Policy" content="default-src 'self'; script-src 'self' 'sha256-addWlmiPftCNoA2cV2rg8oJXfoSVJb2dYW07BSQ+rUs='; style-src 'self' 'unsafe-inline'; img-src 'self' data: blob: https://lh3.googleusercontent.com https://drive.google.com; connect-src https://script.google.com https://script.googleusercontent.com; frame-src https://drive.google.com https://docs.google.com; worker-src 'self' blob:; font-src 'self' data:; base-uri 'self'; form-action 'self'; object-src 'none'">
+<meta name="referrer" content="no-referrer">
 <meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
 <title>Стартум · домашки</title>
 <meta name="description" content="Домашки, баллы и прогресс учеников школы «Стартум»">
 <meta name="theme-color" content="#0B0F2B">
 <link rel="icon" type="image/png" href="./logo.png">
-<link rel="apple-touch-icon" href="./logo.png">
-  <script type="module" crossorigin src="./assets/index-EYhopjDD.js"></script>
-  <link rel="stylesheet" crossorigin href="./assets/index-I_-0IVVm.css">
+<link rel="apple-touch-icon" href="./apple-touch-icon.png">
+<link rel="manifest" href="./manifest.webmanifest">
+<link rel="preconnect" href="https://script.google.com" crossorigin>
+<link rel="preconnect" href="https://script.googleusercontent.com" crossorigin>
+<script>
+// Кабинет запрашиваем сразу, пока грузится сам сайт: экономит время загрузки кода. Подхватывает boot() в api.js.
+(function () {
+  // в чужой рамке не открываемся (кликджекинг): уводим наверх, а если браузер не дал — прячем страницу
+  if (top !== self) { try { top.location = self.location; } catch (e) {} document.documentElement.style.display = 'none'; return; }
+  try {
+    var s = localStorage.getItem('startum_s');
+    if (!s || /[?&](m|k|t|inv)=/.test(location.search)) return;
+    var b = JSON.parse(localStorage.getItem('startum_boot') || 'null'), etag = b && b.data ? b.etag || '' : '';
+    var p = fetch('https://script.google.com/macros/s/AKfycbyCRvM9lvBYQARcGSCFEqgoJTlMCFOyWVYuabAsFmUOG8KpcziNb6UTBxXDZ5iuYbcF/exec', { method: 'POST', redirect: 'follow', headers: { 'Content-Type': 'text/plain;charset=utf-8' },
+      body: JSON.stringify({ fn: 'webBoot', args: [s, etag] }) }).then(function (r) { return r.text(); });
+    p.catch(function () {});
+    window.__boot = { s: s, etag: etag, p: p, t: Date.now() };
+  } catch (e) {}
+})();
+</script>
+  <script type="module" crossorigin src="./assets/index-BcQxFNxK.js"></script>
+  <link rel="stylesheet" crossorigin href="./assets/index-DoCxDF7I.css">
 </head>
 <body>
 <svg width="0" height="0" style="position:absolute" aria-hidden="true">
@@ -48,8 +69,13 @@
 <symbol id="i-shield" viewBox="0 0 24 24"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/></symbol>
 <symbol id="i-target" viewBox="0 0 24 24"><circle cx="12" cy="12" r="9"/><circle cx="12" cy="12" r="5"/><circle cx="12" cy="12" r="1"/></symbol>
 <symbol id="i-bulb" viewBox="0 0 24 24"><path d="M9 18h6M10 22h4M12 2a7 7 0 0 0-4 12.7V17h8v-2.3A7 7 0 0 0 12 2z"/></symbol>
+<symbol id="i-refresh" viewBox="0 0 24 24"><path d="M20 11a8 8 0 0 0-14.6-4.4L4 8"/><path d="M4 3v5h5"/><path d="M4 13a8 8 0 0 0 14.6 4.4L20 16"/><path d="M20 21v-5h-5"/></symbol>
+<symbol id="i-wifi-off" viewBox="0 0 24 24"><path d="m2 2 20 20"/><path d="M8.5 16.4a5 5 0 0 1 7 0M5 12.9a10 10 0 0 1 5.2-2.7M19 12.9a10 10 0 0 0-2.1-1.6M2 8.8a15 15 0 0 1 4.2-2.7M22 8.8A15 15 0 0 0 11 5"/><path d="M12 20h.01"/></symbol>
+<symbol id="i-msg" viewBox="0 0 24 24"><path d="M21 12a8 8 0 0 1-11.6 7.1L3 21l1.9-6.4A8 8 0 1 1 21 12z"/></symbol>
 <symbol id="i-later" viewBox="0 0 24 24"><path d="M21 12a9 9 0 1 1-3-6.7L21 8"/><path d="M21 3v5h-5M12 7v5l3 2"/></symbol>
 </svg>
+<div class="netbar" id="net" role="status" hidden><svg class="i s" aria-hidden="true"><use href="#i-wifi-off"/></svg>Нет связи — показываем сохранённое</div>
+<div class="ptr" id="ptr" aria-hidden="true"><svg class="i" aria-hidden="true"><use href="#i-refresh"/></svg></div>
 <div id="root"></div>
 <div class="toasts" id="toasts" role="status" aria-live="polite"></div>
 </body>
