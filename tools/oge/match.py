@@ -120,7 +120,7 @@ def main():
                 s = min(s, 0.5)
             if t.get("group") and r.get("textSig"):
                 g = gfe.get(t["group"], empty)
-                s = 0.55 * s + 0.45 * (0.5 * nsim(g, r["_t"]) + 0.5 * jac(g[1], r["_t"][1]))
+                s = 0.4 * s + 0.6 * (0.5 * nsim(g, r["_t"]) + 0.5 * jac(g[1], r["_t"][1]))
             scored.append((s, i))
             if s > bs:
                 best, bs, second = r, s, bs
@@ -129,7 +129,7 @@ def main():
         scored.sort(reverse=True)
         # запасные кандидаты — для проверки ответа через ФИПИ, если ответ лучшего не подтвердится
         alts = [{"sid": sd[i]["sid"], "type": sd[i]["type"], "cat": sd[i]["cat"], "proto": sd[i]["proto"],
-                 "ans": sd[i]["ans"], "srcs": sd[i]["srcs"], "score": round(s2, 3)} for s2, i in scored[1:4] if s2 >= 0.62]
+                 "ans": sd[i]["ans"], "srcs": sd[i]["srcs"], "score": round(s2, 3)} for s2, i in scored[1:(9 if t.get("group") else 4)] if s2 >= 0.6]
         if best and bs >= 0.7:
             res[t["fid"]] = {"sid": best["sid"], "type": best["type"], "cat": best["cat"], "proto": best["proto"],
                              "ans": best["ans"], "srcs": best["srcs"], "score": round(bs, 3), "second": round(second, 3),

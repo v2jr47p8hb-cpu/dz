@@ -76,7 +76,7 @@ def main():
                 if r.text.strip() == "3":
                     rec.update(ok=True, ans=v, sid=c["sid"])
                     break
-            if rec["ok"] or len(rec["tried"]) >= 6:
+            if rec["ok"] or len(rec["tried"]) >= (10 if t.get("group") else 6):
                 break
         done[t["fid"]] = rec
         n += 1
