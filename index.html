@@ -2,12 +2,12 @@
 <html lang="ru" data-role="s">
 <head>
 <meta charset="utf-8">
-<meta http-equiv="Content-Security-Policy" content="default-src 'self'; script-src 'self' 'sha256-addWlmiPftCNoA2cV2rg8oJXfoSVJb2dYW07BSQ+rUs='; style-src 'self' 'unsafe-inline'; img-src 'self' data: blob: https://lh3.googleusercontent.com https://drive.google.com; connect-src https://script.google.com https://script.googleusercontent.com; frame-src https://drive.google.com https://docs.google.com; worker-src 'self' blob:; font-src 'self' data:; base-uri 'self'; form-action 'self'; object-src 'none'">
+<meta http-equiv="Content-Security-Policy" content="default-src 'self'; script-src 'self' 'sha256-0OPvhkDWvJQEUKRINuxhwFVG8MquHapTn9oVZf5cD+s='; style-src 'self' 'unsafe-inline'; img-src 'self' data: blob: https://lh3.googleusercontent.com https://drive.google.com; connect-src https://script.google.com https://script.googleusercontent.com; frame-src https://drive.google.com https://docs.google.com; worker-src 'self' blob:; font-src 'self' data:; base-uri 'self'; form-action 'self'; object-src 'none'">
 <meta name="referrer" content="no-referrer">
 <meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
 <title>Стартум · домашки</title>
 <meta name="description" content="Домашки, баллы и прогресс учеников школы «Стартум»">
-<meta name="theme-color" content="#0B0F2B">
+<meta name="theme-color" content="#06081D">
 <link rel="icon" type="image/png" href="./logo.png">
 <link rel="apple-touch-icon" href="./apple-touch-icon.png">
 <link rel="manifest" href="./manifest.webmanifest">
@@ -18,6 +18,15 @@
 (function () {
   // в чужой рамке не открываемся (кликджекинг): уводим наверх, а если браузер не дал — прячем страницу
   if (top !== self) { try { top.location = self.location; } catch (e) {} document.documentElement.style.display = 'none'; return; }
+  // тема и роль — до первой отрисовки, иначе светлая тема (и пульт) мигает тёмной; то же делает applyTheme() в main.js
+  try {
+    var r = document.documentElement, th = localStorage.getItem('startum_theme');
+    if (localStorage.getItem('startum_s') && localStorage.getItem('startum_role') === 't' && !/[?&](m|k|t|inv)=/.test(location.search)) r.dataset.role = 't';
+    if (th === 'system') th = matchMedia('(prefers-color-scheme: dark)').matches ? 'dark' : 'light';
+    if (th === 'light' || th === 'dark') r.dataset.theme = th;
+    var light = th === 'light' || (th !== 'dark' && r.dataset.role === 't');
+    document.querySelector('meta[name=theme-color]').content = light ? '#F9FAFD' : '#06081D';
+  } catch (e) {}
   try {
     var s = localStorage.getItem('startum_s');
     if (!s || /[?&](m|k|t|inv)=/.test(location.search)) return;
@@ -29,8 +38,8 @@
   } catch (e) {}
 })();
 </script>
-  <script type="module" crossorigin src="./assets/index-BUyj0sNy.js"></script>
-  <link rel="stylesheet" crossorigin href="./assets/index-CWjTUs7U.css">
+  <script type="module" crossorigin src="./assets/index-BIrdYZfT.js"></script>
+  <link rel="stylesheet" crossorigin href="./assets/index-DklYA2R1.css">
 </head>
 <body>
 <svg width="0" height="0" style="position:absolute" aria-hidden="true">
