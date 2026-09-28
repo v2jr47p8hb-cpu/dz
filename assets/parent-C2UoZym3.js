@@ -1,0 +1,19 @@
+import{a as e,i as t,n,o as r,r as i,s as a}from"./index-Dd5WtYWU.js";var o=e=>e>=80?`ok`:e>=50?`late`:`bad`;async function s(s){document.documentElement.dataset.role=`s`,document.title=`Стартум · для родителей`,n(`#root`).innerHTML=`<main class="wrap" aria-busy="true"><p class="muted" style="padding:40px 0">Загружаем…</p></main>`;let c;try{c=await a(`webParentData`,s)}catch(e){n(`#root`).innerHTML=`<div style="min-height:100vh;display:grid;place-items:center;padding:24px"><div class="panel" style="max-width:420px;text-align:center"><h2>Ссылка не открылась</h2><p class="muted" style="margin-top:10px">${i(e.message)}</p></div></div>`;return}let l=c.items.slice().sort((e,t)=>+!!t.overdue-!!e.overdue),u=l.filter(e=>e.overdue&&!(e.status&&e.status!==`❌`)),d=e=>e&&e.length?`<p class="faint xs" style="margin-top:4px">по задачам: ${e.map((e,t)=>`№${t+1} ${e[0]}/${e[1]}`).join(` · `)}</p>`:``;n(`#root`).innerHTML=`<header class="topbar"><span class="brand">${t}${r}</span><span class="faint sm">для родителей · только просмотр</span></header>
+  <main class="wrap">
+    <div class="phead"><h1>${i(c.name)}</h1><p class="muted">Данные на ${i(c.today)}</p></div>
+    <section class="bento">
+      <div class="cell big"><p class="lbl">Сдано вовремя</p><p class="num">${c.pct??0}%</p><p class="faint xs">из ${c.den||0} заданий</p></div>
+      <div class="cell"><p class="lbl">Долги</p><p class="num">${c.debts||0}</p></div>
+      <div class="cell"><p class="lbl">С опозданием</p><p class="num">${c.late||0}</p></div>
+      <div class="cell"><p class="lbl">Частично</p><p class="num">${c.part||0}</p></div>
+    </section>
+    ${c.groups.map(e=>`<section class="panel sec"><div class="sec-h"><h2 style="margin:0">${i(e.icon||``)} ${i(e.title)}</h2>${e.den?`<span class="st ${o(e.pct)}">${e.pct??0}% вовремя</span>`:`<span class="st na">заданий пока нет</span>`}</div>
+      <p class="sm" style="margin-top:8px">Долгов: <b>${e.debts||0}</b>${e.miss&&e.miss.length?` (уроки ${e.miss.map(e=>`№\xA0`+e).join(`, `)})`:``}${e.place?` · место в группе: <b>${e.place}</b> из ${e.of}`:``}</p>
+      ${e.next&&e.next.length?`<p class="faint sm" style="margin-top:6px">Следующие занятия: ${e.next.map(e=>`${i(e.when||e.wd)} ${i(e.date)} ${i(e.time||``)}`).join(` · `)}</p>`:``}</section>`).join(``)}
+    ${u.length?`<h2 class="sec">Не сдано в срок</h2><div class="list">${u.map(e=>`<div class="row" style="grid-template-columns:minmax(0,1fr) auto"><div><b>${i(e.topic||`Урок `+e.n)}</b><p class="faint xs">${i(e.gt)} · урок № ${e.n} · срок ${i(e.deadline||``)}</p></div><span class="st bad">Долг</span></div>`).join(``)}</div>`:``}
+    ${c.mocks.length?`<h2 class="sec">Пробники</h2><div class="list">${c.mocks.map(e=>`<div class="row" style="grid-template-columns:minmax(0,1fr) auto"><div><b>${i(e.title)}</b></div>${e.state===`done`?e.total==null?`<span class="st late">проверяется</span>`:`<span class="st ok">${e.scale&&e.scale.test!=null?`${e.scale.test} тестовых · `:``}${e.total}${e.max?` из `+e.max:``} перв.</span>`:e.state===`going`?`<span class="st now">пишет</span>`:e.state===`missed`?`<span class="st bad">пропущен</span>`:`<span class="st na">ещё не начат</span>`}</div>`).join(``)}</div>`:``}
+    <h2 class="sec">Все домашние задания</h2>
+    <div class="list">${l.map(t=>`<div class="row" style="grid-template-columns:minmax(0,1fr) auto"><div><b>${i(t.topic||`Урок `+t.n)}</b><p class="faint xs">${i(t.gt)} · урок № ${t.n}${t.date?` · выдано `+i(t.date):``}${t.deadline?` · срок `+i(t.deadline):``}</p>${d(t.parts)}</div>
+      ${t.status&&t.status!==`❌`?e(t.status,t.score):t.returned?`<span class="st ret">На доработке</span>`:t.overdue?`<span class="st bad">Долг</span>`:`<span class="st now">Открыто</span>`}</div>`).join(``)||`<p class="muted">Заданий пока нет.</p>`}</div>
+    <p class="faint xs" style="margin:28px 0">Страница обновляется при каждом открытии. Вопросы — преподавателю.</p>
+  </main>`}export{s as renderParent};
