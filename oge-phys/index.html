@@ -2,14 +2,14 @@
 <html lang="ru">
 <head>
 <meta charset="utf-8">
-<meta http-equiv="Content-Security-Policy" content="default-src 'self'; script-src 'self' 'sha256-hQ9gWUu0ptYUAsCMLiJCHG6cseX5aBlqVOptoDmZod8='; style-src 'self' 'unsafe-inline'; img-src 'self' data: blob: https://lh3.googleusercontent.com https://drive.google.com; connect-src 'self' https://script.google.com https://script.googleusercontent.com; frame-src https://drive.google.com https://docs.google.com; worker-src 'self' blob:; font-src 'self' data:; base-uri 'self'; form-action 'self'; object-src 'none'">
+<meta http-equiv="Content-Security-Policy" content="default-src 'self'; script-src 'self' 'sha256-hQ9gWUu0ptYUAsCMLiJCHG6cseX5aBlqVOptoDmZod8=' 'sha256-GCsXqdQTm42mgAXHo+0A6ZQAd5nakBNWkrIeHY1uxT0='; style-src 'self' 'unsafe-inline'; img-src 'self' data: blob: https://lh3.googleusercontent.com https://drive.google.com; connect-src 'self' https://script.google.com https://script.googleusercontent.com; frame-src https://drive.google.com https://docs.google.com; worker-src 'self' blob:; font-src 'self' data:; base-uri 'self'; form-action 'self'; object-src 'none'">
 <meta name="referrer" content="no-referrer">
 <meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
-<title>ОГЭ · математика — Стартум</title>
-<meta name="description" content="Банк задач ОГЭ по математике по номерам и прототипам, теория и домашние задания — школа «Стартум»">
+<title>ОГЭ · физика — Стартум</title>
+<meta name="description" content="Банк задач ОГЭ по физике по номерам и прототипам, теория и домашние задания — школа «Стартум»">
 <meta name="theme-color" content="#06081D">
 <link rel="icon" type="image/png" sizes="32x32" href="../favicon-32.png">
-<link rel="stylesheet" href="./vendor/katex/katex.min.css">
+<link rel="stylesheet" href="../oge/vendor/katex/katex.min.css">
 <script>
 // тема и роль — те же ключи, что в кабинете (startum_theme, startum_role): без мигания при загрузке
 (function () {
@@ -31,7 +31,7 @@
 </head>
 <body>
 <header class="top"><div class="top-in">
-  <a class="brand" href="#/"><img src="../logo.png" alt="" width="28" height="28"><span class="subj m" aria-hidden="true">М</span><span>ОГЭ · математика<small>Стартум</small></span></a>
+  <a class="brand" href="#/"><img src="../logo.png" alt="" width="28" height="28"><span class="subj" aria-hidden="true">Ф</span><span>ОГЭ · физика<small>Стартум</small></span></a>
   <nav class="nav" id="nav" aria-label="Разделы">
     <a href="#/" data-nav="/">Каталог</a>
     <a href="#/theory" data-nav="/theory">Теория</a>
@@ -40,6 +40,11 @@
   </nav>
 </div></header>
 <main id="main" tabindex="-1"><p class="muted">Загружаем банк задач…</p></main>
-<script src="./vendor/katex/katex.min.js"></script>
+<script src="../oge/vendor/katex/katex.min.js"></script>
+<script>
+// предмет страницы — общий код oge/app.js читает эти настройки; данные — рядом: oge-phys/data, oge-phys/theory
+window.OGE = { title: 'ОГЭ · физика', name: 'физике', exam: 'phys-oge', subj: 'Ф', img: '../bank/oge-phys/img/', sdam: 'phys-oge', cart: 'startum_oge_phys_cart', prefix: 'op-',
+  blocks: [['part1', 'Часть 1', 'задания с кратким ответом и выбором'], ['part2', 'Часть 2', 'развёрнутый ответ и эксперимент']] };
+</script>
 </body>
 </html>
