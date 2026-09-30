@@ -1,0 +1,334 @@
+<title>ЛР №2 — анализ фильтрата</title>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Literata:opsz,wght@7..72,500;7..72,700&family=IBM+Plex+Sans:wght@400;500;600&family=IBM+Plex+Mono:wght@400;500&display=swap">
+<style>
+/* Layout: одна колонка конспекта + липкое оглавление слева на широких экранах; цвета индикаторов — как реальные окраски при титровании */
+:root{
+  --bg:#f5f7f6; --paper:#ffffff; --fg:#1c2622; --muted:#5b6a64; --line:#d9e1dd;
+  --accent:#1f6f5c; --accent-soft:#e3f0ec;
+  --good:#1d7a4a; --good-bg:#e4f4ea; --bad:#b3372c; --bad-bg:#fbe9e6; --warn:#9a6a00; --warn-bg:#fdf3dc;
+  --phph:#e0457b; --mo-y:#e8b923; --mo-r:#e0664f; --wine:#8c1d3f; --blue:#2f6fd0; --violet:#7a3fb0; --chrom-y:#e6c22e; --brown:#9b4a24;
+  --f-display:"Literata",Georgia,serif; --f-body:"IBM Plex Sans",system-ui,sans-serif; --f-mono:"IBM Plex Mono",ui-monospace,monospace;
+}
+@media (prefers-color-scheme: dark){:root:not([data-theme="light"]){
+  --bg:#111715; --paper:#18201d; --fg:#e4ece8; --muted:#9aaba4; --line:#2c3834;
+  --accent:#5cc0a4; --accent-soft:#1d312b;
+  --good:#6fd39a; --good-bg:#17301f; --bad:#f08c80; --bad-bg:#3a1c19; --warn:#e8b94a; --warn-bg:#352a12; color-scheme:dark}}
+:root[data-theme="dark"]{
+  --bg:#111715; --paper:#18201d; --fg:#e4ece8; --muted:#9aaba4; --line:#2c3834;
+  --accent:#5cc0a4; --accent-soft:#1d312b;
+  --good:#6fd39a; --good-bg:#17301f; --bad:#f08c80; --bad-bg:#3a1c19; --warn:#e8b94a; --warn-bg:#352a12; color-scheme:dark}
+*{box-sizing:border-box}
+body{background:var(--bg);color:var(--fg);font:16px/1.6 var(--f-body);padding-inline:16px;padding-block:24px 64px}
+.wrap{max-width:1120px;margin:0 auto;display:grid;grid-template-columns:220px minmax(0,1fr);gap:40px}
+nav{position:sticky;top:calc(env(safe-area-inset-top,0px) + 16px);align-self:start;font-size:14px}
+nav b{display:block;font:600 11px var(--f-body);letter-spacing:.08em;text-transform:uppercase;color:var(--muted);margin-bottom:8px}
+nav a{display:block;color:var(--fg);text-decoration:none;padding:4px 0 4px 10px;border-left:2px solid var(--line)}
+nav a:hover,nav a:focus-visible{border-color:var(--accent);color:var(--accent);outline:none}
+main{min-width:0;display:flex;flex-direction:column;gap:48px}
+header h1{font:700 clamp(28px,4.5vw,42px)/1.15 var(--f-display);margin:0 0 8px;text-wrap:balance}
+header p{margin:0;color:var(--muted);max-width:65ch}
+.eyebrow{font:600 12px var(--f-body);letter-spacing:.1em;text-transform:uppercase;color:var(--accent);margin-bottom:6px}
+h2{font:700 26px/1.2 var(--f-display);margin:0 0 16px;text-wrap:balance}
+h3{font:600 18px/1.3 var(--f-body);margin:24px 0 8px}
+p,li{max-width:70ch}
+section{scroll-margin-top:16px}
+.tbl{overflow-x:auto;border:1px solid var(--line);border-radius:8px;background:var(--paper)}
+table{border-collapse:collapse;width:100%;font-size:14.5px;font-variant-numeric:tabular-nums}
+th,td{padding:9px 12px;border-bottom:1px solid var(--line);text-align:left;vertical-align:top}
+th{font-weight:600;font-size:13px;color:var(--muted);background:var(--accent-soft)}
+tr:last-child td{border-bottom:0}
+td.n{text-align:right;font-family:var(--f-mono)}
+.formula{font-family:var(--f-mono);background:var(--paper);border:1px solid var(--line);border-left:3px solid var(--accent);padding:10px 14px;border-radius:6px;margin:12px 0;overflow-x:auto}
+code{font-family:var(--f-mono);font-size:.92em;background:var(--accent-soft);padding:1px 5px;border-radius:4px}
+.pill{display:inline-block;font-size:12.5px;font-weight:600;padding:2px 9px;border-radius:99px;white-space:nowrap}
+.good{background:var(--good-bg);color:var(--good)} .bad{background:var(--bad-bg);color:var(--bad)} .warn{background:var(--warn-bg);color:var(--warn)}
+.sw{display:inline-flex;align-items:center;gap:6px;white-space:nowrap}
+.sw i{width:14px;height:14px;border-radius:50%;display:inline-block;border:1px solid var(--line)}
+.arrow{color:var(--muted);margin:0 4px}
+.cls{display:grid;grid-template-columns:repeat(auto-fit,minmax(200px,1fr));gap:12px;margin:16px 0}
+.cls div{background:var(--paper);border:1px solid var(--line);border-radius:8px;padding:12px 14px;display:flex;flex-direction:column;gap:6px}
+.cls .cond{font:600 17px var(--f-mono)}
+.cls .name{font-weight:600}
+.cls small{color:var(--muted);font-family:var(--f-mono);font-size:12.5px}
+.note{background:var(--warn-bg);border-radius:8px;padding:12px 16px;max-width:none}
+.note p{margin:0}
+.callout{background:var(--accent-soft);border-radius:8px;padding:14px 18px}
+.callout p{margin:0;max-width:none}
+.qa{display:flex;flex-direction:column;gap:10px}
+details{background:var(--paper);border:1px solid var(--line);border-radius:8px;padding:12px 16px}
+summary{cursor:pointer;font-weight:600}
+summary:focus-visible{outline:2px solid var(--accent);outline-offset:3px}
+details[open] summary{margin-bottom:8px}
+details > *:not(summary){margin-top:8px}
+.teacher{border-color:var(--accent)}
+.teacher summary::after{content:"спрашивал";margin-left:10px;font-size:11px;font-weight:600;letter-spacing:.06em;text-transform:uppercase;color:var(--accent)}
+ul{padding-left:20px;margin:8px 0} li{margin:4px 0}
+@media (max-width:820px){.wrap{grid-template-columns:minmax(0,1fr)} nav{position:static;display:flex;flex-wrap:wrap;gap:4px 12px} nav b{width:100%} nav a{border:0;padding:2px 0;color:var(--accent)}}
+@media (prefers-reduced-motion:reduce){*{scroll-behavior:auto}}
+html{scroll-behavior:smooth}
+</style>
+
+<div class="wrap">
+<nav aria-label="Оглавление">
+  <b>Содержание</b>
+  <a href="#data">Наши данные</a>
+  <a href="#principle">Принцип титрования</a>
+  <a href="#indicators">Индикаторы</a>
+  <a href="#alk">Щёлочность Pf, Mf, Pm</a>
+  <a href="#class">Классификация щёлочности</a>
+  <a href="#treat">Обработка раствора</a>
+  <a href="#cl">Хлор-ионы</a>
+  <a href="#hard">Жёсткость, Ca, Mg</a>
+  <a href="#ours">Разбор наших проб</a>
+  <a href="#teacher">Вопросы преподавателя</a>
+  <a href="#faq">Быстрые вопросы</a>
+</nav>
+
+<main>
+<header>
+  <div class="eyebrow">Лабораторная работа № 2 · конспект к защите</div>
+  <h1>Химический анализ фильтрата бурового раствора</h1>
+  <p>Теория только по тому, что мы мерили, классификация щёлочности с названиями, разбор наших четырёх проб и ответы на вопросы преподавателя.</p>
+</header>
+
+<section id="data">
+  <div class="eyebrow">Раздел 0</div>
+  <h2>Что мы измеряли</h2>
+  <div class="tbl"><table>
+    <tr><th>Проба</th><th>Pf, мл</th><th>Mf, мл</th><th>Pm, мл</th><th>Cl⁻, мг/л</th><th>Ж, мг/л</th><th>Ca²⁺, мг/л</th><th>Mg²⁺, мг/л</th></tr>
+    <tr><td>1</td><td class="n">0,15</td><td class="n">0,77</td><td class="n">0,32</td><td class="n">89 498</td><td class="n">614</td><td class="n">600</td><td class="n">8,4</td></tr>
+    <tr><td>2</td><td class="n">0,80</td><td class="n">1,80</td><td class="n">1,68</td><td class="n">86 094</td><td class="n">160</td><td class="n">160</td><td class="n">12</td></tr>
+    <tr><td>3</td><td class="n">0,24</td><td class="n">0,94</td><td class="n">0,62</td><td class="n">43 247</td><td class="n">208</td><td class="n">220</td><td class="n">19</td></tr>
+    <tr><td>4</td><td class="n">0,45</td><td class="n">1,80</td><td class="n">0,50</td><td class="n">45 806</td><td class="n">200</td><td class="n">240</td><td class="n">24</td></tr>
+  </table></div>
+  <p><b>Мерили:</b> Pf, Mf, Pm, хлориды, общую жёсткость, кальций; магний посчитали.<br>
+  <b>Не мерили</b> (в методичке есть): меркуриметрический метод Cl⁻, прямое определение Mg²⁺, сульфаты, содержание извести (нужна доля воды Fw из реторты).</p>
+</section>
+
+<section id="principle">
+  <div class="eyebrow">Раздел 1</div>
+  <h2>Общий принцип — титрование</h2>
+  <p>Раствором <b>известной</b> концентрации n₁ определяют <b>неизвестную</b> концентрацию n₂ вещества в известном объёме пробы V₂. Конец титрования показывает индикатор.</p>
+  <div class="formula">n₁ · V₁ = n₂ · V₂ &nbsp;→&nbsp; n₂ = n₁ · V₁ / V₂</div>
+  <ul>
+    <li><b>n₁</b> — нормальность титранта (кислоты, AgNO₃, трилона Б);</li>
+    <li><b>V₁</b> — объём титранта до конца титрования, мл;</li>
+    <li><b>V₂</b> — объём пробы фильтрата, мл.</li>
+  </ul>
+  <p><b>Индикатор</b> — вещество, которое меняет цвет при изменении pH или концентрации иона.</p>
+  <p><b>Фильтрат</b> получали фильтр-прессом, как при определении водоотдачи. Упрощённо — через бумажный фильтр в воронке или на вакуумной установке (колба Бунзена, воронка Бюхнера, насос).</p>
+</section>
+
+<section id="indicators">
+  <div class="eyebrow">Раздел 1.1 · частый вопрос</div>
+  <h2>Индикаторы</h2>
+  <div class="tbl"><table>
+    <tr><th>Индикатор</th><th>Переход окраски</th><th>Точка</th><th>Что определяем</th><th>Титрант</th></tr>
+    <tr><td><b>Фенолфталеин</b></td><td><span class="sw"><i style="background:var(--phph)"></i>розовый</span><span class="arrow">→</span><span class="sw"><i style="background:var(--paper)"></i>бесцветный</span></td><td>pH 8,3</td><td>Pf, Pm</td><td>H₂SO₄ 0,02 N</td></tr>
+    <tr><td><b>Метилоранж</b></td><td><span class="sw"><i style="background:var(--mo-y)"></i>жёлтый</span><span class="arrow">→</span><span class="sw"><i style="background:var(--mo-r)"></i>розовый</span></td><td>pH 4,3</td><td>Mf</td><td>H₂SO₄ 0,02 N</td></tr>
+    <tr><td><b>Эриохром чёрный Т</b> / кальмагит</td><td><span class="sw"><i style="background:var(--wine)"></i>винно-красный</span><span class="arrow">→</span><span class="sw"><i style="background:var(--blue)"></i>голубой</span></td><td>pH ≈ 10</td><td>Общая жёсткость (Ca + Mg)</td><td>Трилон Б (ЭДТА)</td></tr>
+    <tr><td><b>Мурексид</b></td><td><span class="sw"><i style="background:var(--phph)"></i>красный</span><span class="arrow">→</span><span class="sw"><i style="background:var(--violet)"></i>фиолетовый</span></td><td>pH 12–13</td><td>Кальций</td><td>Трилон Б (ЭДТА)</td></tr>
+    <tr><td><b>Хромат калия K₂CrO₄</b></td><td><span class="sw"><i style="background:var(--chrom-y)"></i>жёлтый</span><span class="arrow">→</span><span class="sw"><i style="background:var(--brown)"></i>красно-бурый</span></td><td>избыток Ag⁺</td><td>Хлориды</td><td>AgNO₃</td></tr>
+  </table></div>
+</section>
+
+<section id="alk">
+  <div class="eyebrow">Раздел 2</div>
+  <h2>Щёлочность: Pf, Mf, Pm</h2>
+  <ul>
+    <li><b>Pf</b> — мл 0,02 N H₂SO₄ на <b>1 мл фильтрата</b> до обесцвечивания фенолфталеина (pH 8,3).</li>
+    <li><b>Mf</b> — <b>общий</b> объём 0,02 N кислоты на 1 мл фильтрата до перехода метилоранжа (pH 4,3). Включает Pf, поэтому всегда <b>Mf ≥ Pf</b>.</li>
+    <li><b>Pm</b> — то же, что Pf, но на <b>1 мл бурового раствора</b>, разбавленного 25–50 мл воды. Учитывает и нерастворённую щёлочь (известь в твёрдой фазе), поэтому обычно Pm &gt; Pf.</li>
+  </ul>
+  <h3>Ход титрования</h3>
+  <ul>
+    <li>1 мл фильтрата + 2–3 капли фенолфталеина. Розовый — титруем кислотой до исчезновения цвета → <b>Pf</b>.</li>
+    <li>В ту же колбу 2–3 капли метилоранжа, титруем до розового → общий объём = <b>Mf</b>.</li>
+    <li>1 мл раствора + 25–50 мл воды + 4–5 капель фенолфталеина, титруем → <b>Pm</b>.</li>
+    <li>Если проба тёмная и цвета не видно, конец определяют pH-метром: 8,3 и 4,3.</li>
+  </ul>
+  <h3>Что оттитровывается до какой точки</h3>
+  <div class="tbl"><table>
+    <tr><th>Участок</th><th>Что уходит</th><th>Реакция</th></tr>
+    <tr><td>до pH 8,3 (Pf)</td><td>весь OH⁻ + <b>половина</b> CO₃²⁻</td><td>OH⁻ + H⁺ → H₂O<br>CO₃²⁻ + H⁺ → HCO₃⁻</td></tr>
+    <tr><td>8,3 → 4,3 (Mf − Pf)</td><td>весь HCO₃⁻ (исходный и образовавшийся из карбоната)</td><td>HCO₃⁻ + H⁺ → H₂O + CO₂↑</td></tr>
+  </table></div>
+</section>
+
+<section id="class">
+  <div class="eyebrow">Раздел 2.4 · главное</div>
+  <h2>Классификация щёлочности</h2>
+  <div class="cls">
+    <div><span class="cond">Pf = 0</span><span class="name">Бикарбонатная</span>только HCO₃⁻<span class="pill bad">нестабилен</span><small>HCO₃⁻ = 1220·Mf</small></div>
+    <div><span class="cond">2Pf &lt; Mf</span><span class="name">Карбонатно-бикарбонатная</span>CO₃²⁻ + HCO₃⁻<span class="pill bad">нестабилен</span><small>CO₃²⁻ = 1200·Pf<br>HCO₃⁻ = 1220·(Mf − 2Pf)</small></div>
+    <div><span class="cond">2Pf = Mf</span><span class="name">Карбонатная</span>только CO₃²⁻<span class="pill bad">нестабилен</span><small>CO₃²⁻ = 1200·Pf</small></div>
+    <div><span class="cond">2Pf &gt; Mf</span><span class="name">Гидроксидно-карбонатная</span>OH⁻ + CO₃²⁻<span class="pill good">стабилен</span><small>OH⁻ = 340·(2Pf − Mf)<br>CO₃²⁻ = 1200·(Mf − Pf)</small></div>
+    <div><span class="cond">Pf = Mf</span><span class="name">Гидроксидная</span>только OH⁻<span class="pill good">стабилен</span><small>OH⁻ = 340·Pf</small></div>
+  </div>
+  <p>Условия и оценка стабильности взяты из методички. Коэффициенты расчёта в мг/л — стандартные по API RP 13B, в методичке их нет. Происхождение: 0,02 экв/л × эквивалентная масса × 1000. OH⁻: 17·20 = 340; CO₃²⁻: 30·2·20 = 1200; HCO₃⁻: 61·20 = 1220.</p>
+  <div class="callout"><p><b>Почему нет сочетания OH⁻ + HCO₃⁻?</b> Они реагируют между собой: OH⁻ + HCO₃⁻ → CO₃²⁻ + H₂O.</p></div>
+  <h3>Как запомнить</h3>
+  <p>Pf = 0 — бикарбонат. Pf = Mf — гидроксид. 2Pf = Mf — карбонат. 2Pf больше Mf — к карбонату добавляется гидроксид. 2Pf меньше Mf — к карбонату добавляется бикарбонат.</p>
+  <h3>Содержание извести (не считали — нет Fw)</h3>
+  <div class="formula">Fw = (объёмное содержание воды, %) / 100<br>Известь, кг/м³ = 0,742 · (Pm − Fw·Pf)<br>Известь, фунт/баррель = 0,26 · (Pm − Fw·Pf)</div>
+  <p>Pm − Fw·Pf — щёлочь, которая есть в растворе, но не растворена в фильтрате (избыточная известь).</p>
+</section>
+
+<section id="treat">
+  <div class="eyebrow">Раздел 2.5</div>
+  <h2>Как исправлять плохую щёлочность</h2>
+  <p>Цель: бикарбонат перевести в карбонат, карбонат осадить в CaCO₃ или превратить в гидроксид. Реагенты — известь Ca(OH)₂ и каустическая сода NaOH.</p>
+  <div class="tbl"><table>
+    <tr><th>№</th><th>Реакция</th><th>Когда</th></tr>
+    <tr><td>1</td><td>Ca(HCO₃)₂ + Ca(OH)₂ → 2CaCO₃↓ + 2H₂O</td><td>Кальций есть, Ca ≤ HCO₃⁻ (г-экв/л)</td></tr>
+    <tr><td>2</td><td>Ca(HCO₃)₂ + 2NaOH → CaCO₃↓ + Na₂CO₃ + 2H₂O</td><td>Кальций есть, Ca &gt; HCO₃⁻; сода осаждает лишний кальций</td></tr>
+    <tr><td>3</td><td>NaHCO₃ + Ca(OH)₂ → CaCO₃↓ + NaOH + H₂O</td><td>Кальция нет; бикарбонат натрия превращается в каустическую соду</td></tr>
+    <tr><td>4</td><td>NaHCO₃ + NaOH → Na₂CO₃ + H₂O</td><td>Кальция нет; нужна кальцинированная сода (гипс, ангидрит)</td></tr>
+    <tr><td>5</td><td>Na₂CO₃ + Ca(OH)₂ → CaCO₃↓ + 2NaOH</td><td>Убрать карбонат и поддержать OH-щёлочность</td></tr>
+  </table></div>
+</section>
+
+<section id="cl">
+  <div class="eyebrow">Раздел 3</div>
+  <h2>Хлор-ионы — метод Мора (аргентометрия)</h2>
+  <ul>
+    <li><b>Титрант:</b> AgNO₃ 0,0282 N (4,791 г/л; 1 мл ≡ 1 мг Cl⁻) или 0,282 N.</li>
+    <li><b>Индикатор:</b> хромат калия K₂CrO₄, 5 %.</li>
+    <li><b>Ход:</b> 1–10 мл фильтрата + 25–50 мл воды → оттитровать щёлочь → 5–10 капель хромата → титровать AgNO₃ до перехода жёлтый → красновато-бурый.</li>
+  </ul>
+  <div class="formula">Ag⁺ + Cl⁻ → AgCl↓ &nbsp;(белый, пока есть Cl⁻)<br>2Ag⁺ + CrO₄²⁻ → Ag₂CrO₄↓ &nbsp;(красно-бурый — конец титрования)</div>
+  <div class="formula">X(Cl⁻) = V·N·1000 / a, мг-экв/л &nbsp;&nbsp; Y(Cl⁻) = X · 35,5, мг/л</div>
+  <p>V — мл AgNO₃, N — его нормальность, a — мл фильтрата, 35,5 — эквивалент хлора. Щёлочь нейтрализуют заранее: при высоком pH серебро осаждается в виде Ag₂O и результат завышается.</p>
+</section>
+
+<section id="hard">
+  <div class="eyebrow">Раздел 4–6</div>
+  <h2>Общая жёсткость, кальций, магний</h2>
+  <h3>Общая жёсткость (трилонометрия)</h3>
+  <ul>
+    <li><b>Жёсткость</b> — сумма Ca²⁺ + Mg²⁺. Единица с 1952 г. — 1 мг-экв/л.</li>
+    <li><b>Титрант:</b> трилон Б (Na₂-ЭДТА) 0,01 моль/л; 1 мл = 400 мг/л Ca²⁺ на 1 мл пробы.</li>
+    <li><b>Буфер</b> аммиачный, pH ≈ 10. <b>Индикатор</b> — эриохром чёрный Т. Триэтаноламин маскирует мешающие Fe и Al.</li>
+    <li><b>Переход:</b> винно-красный → голубой.</li>
+  </ul>
+  <div class="formula">Ж, мг/л = V(ЭДТА) · 400 / V(фильтрата)<br>Ж_X = V·N·1000 / a (мг-экв/л); &nbsp;Ж_Y = Ж_X · 40 (мг/л)</div>
+  <h3>Кальций</h3>
+  <p>То же ЭДТА, но при <b>pH 12–13</b> (2 мл 1 N NaOH или KOH). При таком pH Mg²⁺ выпадает в Mg(OH)₂ и не титруется, поэтому считается только кальций. Индикатор — мурексид, переход красный → фиолетовый, устойчивый 3–5 минут.</p>
+  <div class="formula">X(Ca²⁺) = V·N·1000 / a, мг-экв/л; &nbsp;Y(Ca²⁺) = X · 40, мг/л</div>
+  <h3>Магний (расчётом)</h3>
+  <div class="formula">Y(Mg²⁺) = 0,6 · (Ж_Y − Y(Ca²⁺)), мг/л</div>
+  <p>Разность «жёсткость минус кальций» — это магний в пересчёте на кальций. Множитель 0,6 = 24,3 / 40 — отношение атомных масс Mg и Ca.</p>
+</section>
+
+<section id="ours">
+  <div class="eyebrow">Раздел 7</div>
+  <h2>Разбор наших проб</h2>
+  <h3>Тип щёлочности</h3>
+  <div class="tbl"><table>
+    <tr><th>Проба</th><th>Pf</th><th>Mf</th><th>2Pf</th><th>Условие</th><th>Тип</th><th>OH⁻</th><th>CO₃²⁻, мг/л</th><th>HCO₃⁻, мг/л</th></tr>
+    <tr><td>1</td><td class="n">0,15</td><td class="n">0,77</td><td class="n">0,30</td><td>2Pf &lt; Mf</td><td><span class="pill bad">карб.-бикарб.</span></td><td class="n">0</td><td class="n">180</td><td class="n">573</td></tr>
+    <tr><td>2</td><td class="n">0,80</td><td class="n">1,80</td><td class="n">1,60</td><td>2Pf &lt; Mf</td><td><span class="pill bad">карб.-бикарб.</span></td><td class="n">0</td><td class="n">960</td><td class="n">244</td></tr>
+    <tr><td>3</td><td class="n">0,24</td><td class="n">0,94</td><td class="n">0,48</td><td>2Pf &lt; Mf</td><td><span class="pill bad">карб.-бикарб.</span></td><td class="n">0</td><td class="n">288</td><td class="n">561</td></tr>
+    <tr><td>4</td><td class="n">0,45</td><td class="n">1,80</td><td class="n">0,90</td><td>2Pf &lt; Mf</td><td><span class="pill bad">карб.-бикарб.</span></td><td class="n">0</td><td class="n">540</td><td class="n">1098</td></tr>
+  </table></div>
+  <p>Во всех четырёх пробах щёлочность карбонатно-бикарбонатная, гидроксид-ионов нет. По методичке такой раствор нестабилен: возможны высокие СНС и вязкость, неустойчивая водоотдача.</p>
+  <ul>
+    <li><b>Проба 2</b> ближе всех к чисто карбонатной (1,6 против 1,8): карбоната больше всего, бикарбоната меньше всего. Лучшая из четырёх.</li>
+    <li><b>Проба 4</b> — больше всего бикарбоната (1098 мг/л). Худшая по щёлочности.</li>
+  </ul>
+
+  <h3>Какую обработку выбрать</h3>
+  <p>Сравниваем кальций и бикарбонат в мг-экв/л. Эквивалентные массы: HCO₃⁻ = 61, Ca²⁺ = 20.</p>
+  <div class="tbl"><table>
+    <tr><th>Проба</th><th>HCO₃⁻, мг-экв/л</th><th>Ca²⁺, мг-экв/л</th><th>Соотношение</th><th>Обработка</th></tr>
+    <tr><td>1</td><td class="n">9,4</td><td class="n">30</td><td>Ca &gt; HCO₃⁻</td><td>№ 2 — NaOH</td></tr>
+    <tr><td>2</td><td class="n">4,0</td><td class="n">8</td><td>Ca &gt; HCO₃⁻</td><td>№ 2 — NaOH</td></tr>
+    <tr><td>3</td><td class="n">9,2</td><td class="n">11</td><td>Ca &gt; HCO₃⁻ (близко)</td><td>№ 2 — NaOH</td></tr>
+    <tr><td>4</td><td class="n">18,0</td><td class="n">12</td><td>Ca &lt; HCO₃⁻</td><td>№ 1 — известь Ca(OH)₂</td></tr>
+  </table></div>
+  <p>Это рассуждение по правилам методички. На защите формулируйте так: «выбор по соотношению эквивалентов кальция и бикарбоната».</p>
+
+  <h3>Pm</h3>
+  <p>Во всех пробах Pm &gt; Pf, значит в растворе есть нерастворённая щёлочь (избыточная известь). Без Fw точно посчитать нельзя. При Fw ≈ 1 (оценка сверху) 0,742·(Pm − Pf) ≈ 0,13; 0,65; 0,28; 0,04 кг/м³ — очень мало, больше всего в пробе 2.</p>
+
+  <h3>Хлориды</h3>
+  <ul>
+    <li><b>Пробы 1 и 2:</b> 86–89 г/л Cl⁻ (около 2 400–2 500 мг-экв/л). В пересчёте на NaCl (×1,65) — 142–148 г/л. Сильно минерализованный, солёный раствор.</li>
+    <li><b>Пробы 3 и 4:</b> 43–46 г/л Cl⁻ (около 1 200–1 300 мг-экв/л), NaCl 71–76 г/л. Тоже минерализованные, но вдвое меньше.</li>
+    <li>Последствия высоких хлоридов: флокуляция глины, рост водоотдачи, коррозия. Нужны солестойкие реагенты.</li>
+  </ul>
+
+  <h3>Жёсткость, кальций, магний</h3>
+  <div class="tbl"><table>
+    <tr><th>Проба</th><th>Ж</th><th>Ca²⁺</th><th>0,6·(Ж − Ca)</th><th>На доске</th><th>Итог</th></tr>
+    <tr><td>1</td><td class="n">614</td><td class="n">600</td><td class="n">8,4</td><td class="n">8,4</td><td><span class="pill good">сходится</span></td></tr>
+    <tr><td>2</td><td class="n">160</td><td class="n">160</td><td class="n">0</td><td class="n">12</td><td><span class="pill warn">не сходится</span></td></tr>
+    <tr><td>3</td><td class="n">208</td><td class="n">220</td><td class="n">−7,2</td><td class="n">19</td><td><span class="pill bad">Ca &gt; Ж</span></td></tr>
+    <tr><td>4</td><td class="n">200</td><td class="n">240</td><td class="n">−24</td><td class="n">24</td><td><span class="pill bad">Ca &gt; Ж</span></td></tr>
+  </table></div>
+  <div class="note"><p><b>Как объяснить на защите.</b> Кальций не может быть больше общей жёсткости, ведь Ж = Ca + Mg. В пробах 2–4 это погрешность эксперимента: нечёткий переход мурексида (фиолетовый плохо виден в окрашенном фильтрате), перетитровка, малый объём пробы (при 1 мл одна лишняя капля ЭДТА даёт около +20 мг/л). Магния там мало, в пределах погрешности; жёсткость во всех пробах в основном кальциевая. При таком количестве Ca²⁺ карбонат осаждается в CaCO₃ и не накапливается.</p></div>
+
+  <h3>Общий вывод</h3>
+  <div class="callout"><p>Во всех четырёх пробах фильтрата щёлочность карбонатно-бикарбонатная (2Pf &lt; Mf), гидроксид-ионы отсутствуют, поэтому растворы нестабильны и требуют обработки каустической содой или известью, чтобы перевести бикарбонаты в карбонаты и осадить их в виде CaCO₃. Pm &gt; Pf — в растворах есть небольшое количество нерастворённой щёлочи. Хлоридов много (43–89 г/л), растворы минерализованы. Жёсткость преимущественно кальциевая (160–614 мг/л), магния мало; в пробах 2–4 Ca &gt; Ж, что объясняется погрешностью титрования.</p></div>
+</section>
+
+<section id="teacher">
+  <div class="eyebrow">Раздел 9</div>
+  <h2>Вопросы, которые задавал преподаватель</h2>
+  <div class="qa">
+    <details class="teacher" open>
+      <summary>Принцип определения хлор-ионов и зачем их определяют</summary>
+      <p><b>Принцип (метод Мора).</b> Фильтрат титруют раствором AgNO₃ с индикатором K₂CrO₄. Серебро сначала связывает весь хлор в белый осадок AgCl. Когда хлор кончился, первая лишняя капля даёт красно-бурый Ag₂CrO₄: окраска меняется с жёлтой на красно-бурую — конец титрования. По объёму AgNO₃ считают Cl⁻: X = V·N·1000/a, Y = X·35,5. Щёлочь предварительно нейтрализуют, иначе серебро уйдёт в Ag₂O или Ag₂CO₃ и результат будет завышен.</p>
+      <p><b>Зачем:</b></p>
+      <ul>
+        <li>контроль минерализации и соответствия рецептуре (солевым растворам нужна заданная концентрация соли);</li>
+        <li>признак разбуривания солей (галит NaCl) или притока минерализованной пластовой воды (рапы);</li>
+        <li>соль коагулирует глину: растут вязкость, СНС и водоотдача, раствор теряет стабильность — нужны солестойкие реагенты;</li>
+        <li>коррозия бурильных труб и оборудования;</li>
+        <li>минерализация фильтрата влияет на электрокаротаж;</li>
+        <li>экология и утилизация отработанного раствора и шлама.</li>
+      </ul>
+    </details>
+    <details class="teacher" open>
+      <summary>Зачем измерять отдельно Pf и Mf</summary>
+      <p>Метилоранж меняет цвет при <b>pH 4,3</b>. К этому моменту оттитрована <b>вся</b> щёлочь: OH⁻, CO₃²⁻ и HCO₃⁻. Значит, Mf показывает только общую щёлочность и не говорит, из каких ионов она состоит.</p>
+      <p>Фенолфталеин срабатывает при <b>pH 8,3</b>. До этой точки уходят весь OH⁻ и половина CO₃²⁻, а бикарбонат ещё не титруется. Pf — это «сильная» щёлочь выше pH 8,3.</p>
+      <p>Неизвестных ионов три, а одна точка даёт одно число. Только сравнивая Pf и Mf (правила 2Pf ⋛ Mf), можно разделить щёлочность на гидроксидную, карбонатную и бикарбонатную. От типа зависит стабильность раствора.</p>
+      <div class="note"><p><b>Уточнение формулировки.</b> Метилоранж не «не видит» гидроксиды и карбонаты: он их тоже оттитровывает, но не отличает от бикарбонатов. Отличить позволяет Pf.</p></div>
+    </details>
+    <details class="teacher" open>
+      <summary>Что показывает щёлочность бурового раствора и зачем она буровикам</summary>
+      <ul>
+        <li><b>Состояние и стабильность раствора.</b> Гидроксидная щёлочность (pH около 9,5–11) держит глину диспергированной. Разжижители (лигносульфонаты, квебрахо, УЩР) и полимеры работают только в щелочной среде.</li>
+        <li><b>Загрязнение.</b> Появление CO₃²⁻ и HCO₃⁻ (Pf падает, Mf растёт) — признак карбонатного загрязнения: CO₂ из пласта, термическое разложение органических реагентов, передозировка соды или бикарбоната. Следствия: высокие СНС и вязкость, нестабильная водоотдача.</li>
+        <li><b>Выбор обработки</b> известью или каустической содой (реакции 1–5) и расчёт содержания извести по Pm и Pf.</li>
+        <li><b>Защита:</b> высокий pH снижает коррозию и связывает сероводород H₂S.</li>
+        <li><b>Контроль Ca и Mg:</b> при высокой OH-щёлочности Mg²⁺ выпадает в Mg(OH)₂, а CO₃²⁻ осаждает Ca²⁺ в CaCO₃.</li>
+      </ul>
+      <div class="callout"><p><b>Одной фразой:</b> щёлочность показывает химическое состояние раствора и его загрязнённость карбонатами и бикарбонатами. По ней решают, как обработать раствор, чтобы сохранить реологию и водоотдачу.</p></div>
+    </details>
+  </div>
+</section>
+
+<section id="faq">
+  <div class="eyebrow">Раздел 8</div>
+  <h2>Быстрые вопросы</h2>
+  <div class="qa">
+    <details><summary>Что такое Pf и Mf?</summary><p>Объём 0,02 N H₂SO₄ на 1 мл фильтрата до pH 8,3 (фенолфталеин) и до pH 4,3 (метилоранж, включая Pf).</p></details>
+    <details><summary>Чем Pm отличается от Pf?</summary><p>Pm определяют по буровому раствору целиком, с твёрдой фазой. Он учитывает нерастворённую известь.</p></details>
+    <details><summary>Почему Mf ≥ Pf?</summary><p>Mf — общий объём кислоты, он включает Pf.</p></details>
+    <details><summary>Почему в правилах стоит 2Pf?</summary><p>До pH 8,3 карбонат оттитровывается наполовину (CO₃²⁻ → HCO₃⁻), вторая половина уходит до pH 4,3.</p></details>
+    <details><summary>Могут ли одновременно быть OH⁻ и HCO₃⁻?</summary><p>Нет, они реагируют с образованием CO₃²⁻.</p></details>
+    <details><summary>Какая щёлочность хорошая, какая плохая?</summary><p>Хорошая — OH⁻ или OH⁻ + CO₃²⁻. Плохая — CO₃²⁻, CO₃²⁻ + HCO₃⁻, HCO₃⁻.</p></details>
+    <details><summary>Чем убрать бикарбонат и карбонат?</summary><p>Известью Ca(OH)₂ или каустической содой NaOH (реакции 1–5). Карбонат осаждается в CaCO₃.</p></details>
+    <details><summary>Зачем перед хлоридами оттитровывать щёлочь?</summary><p>Чтобы серебро не осаждалось в виде оксида или карбоната и не завышало результат.</p></details>
+    <details><summary>Что такое жёсткость и в чём её измеряют?</summary><p>Сумма Ca²⁺ + Mg²⁺, мг-экв/л.</p></details>
+    <details><summary>Почему кальций титруют при pH 12–13?</summary><p>Mg²⁺ выпадает в Mg(OH)₂ и не мешает.</p></details>
+    <details><summary>Откуда 0,6 в формуле магния?</summary><p>24,3 / 40 — отношение атомных масс Mg и Ca.</p></details>
+    <details><summary>Что значит «1 мл ЭДТА = 400 мг/л Ca»?</summary><p>0,01 М ЭДТА × 40 г/моль × 1000 = 400 мг/л на 1 мл пробы.</p></details>
+    <details><summary>Что такое трилон Б?</summary><p>Динатриевая соль ЭДТА (комплексон III, версенат). Образует прочные комплексы с Ca²⁺ и Mg²⁺.</p></details>
+    <details><summary>Почему у нас Ca больше Ж?</summary><p>Погрешность: нечёткий переход мурексида, перетитровка, малый объём пробы.</p></details>
+  </div>
+</section>
+</main>
+</div>
